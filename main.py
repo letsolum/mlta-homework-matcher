@@ -52,17 +52,18 @@ def extract_name(page):
 
 
 def start_of_new_task(text, ind):
-    if text[ind:ind + 2] != '.\n' or ind + 2 == len(text):
+    i = ind
+    if (text[i:i + 2] != '.\n' and text[i:i + 2] != '?\n') or i + 2 == len(text):
         return 0
-    ind += 2
+    i += 2
     l = 0
-    if text[ind] == 'Д':
-        ind += 1
-    while text[ind:ind + l + 1].isdigit():
+    if text[i] == 'Д':
+        i += 1
+    while text[i:i + l + 1].isdigit():
         l += 1
-    if l == 0 or text[ind + l] != '.':
+    if l == 0 or text[i + l] != '.':
         return 0
-    return int(text[ind:ind + l])
+    return int(text[i:i + l])
 
 def get_tasks(pos, all_pages):
     main_page = all_pages[pos]
@@ -71,7 +72,13 @@ def get_tasks(pos, all_pages):
         main_text += '\n'
         main_text += all_pages[pos + 1].extract_text()
         pos += 1
-
+    prv_txt = main_text
+    splt = main_text.split('\n')
+    main_text = ''
+    for e in splt:
+        if e.find('принос') + e.find('балл') != -2:
+            continue
+        main_text += e + '\n'
     ind = main_text.find('устно')
     tasks = []
     while ind + 4 < len(main_text):
